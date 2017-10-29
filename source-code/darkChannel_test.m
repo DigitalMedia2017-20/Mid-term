@@ -1,3 +1,2 @@
-% pic = imread('sweden.jpg');
-pic = imread('Aerial-photo-heavy-haze.jpg');
+pic = imread('sweden.jpg');
 [defuzePic,tmap,tmap_ref] = darkChannel(pic);
