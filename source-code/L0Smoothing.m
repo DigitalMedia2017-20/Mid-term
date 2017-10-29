@@ -1,31 +1,31 @@
 %   Distribution code Version 1.0 -- 09/23/2011 by Jiaya Jia Copyright 2011, The Chinese University of Hong Kong.
 %
 %   The Code is created based on the method described in the following paper 
-%   [1] "Image Smoothing via L0 Gradient Minimization", Li Xu, Cewu Lu, Yi Xu, Jiaya Jia, ACM Transactions on Graphics, 
+%   [1] "Image Smoothing via L0 Gradient MinImageization", Li Xu, Cewu Lu, Yi Xu, Jiaya Jia, ACM Transactions on Graphics, 
 %   (SIGGRAPH Asia 2011), 2011. 
 %  
 %   The code and the algorithm are for non-comercial use only.
 
 
-function S = L0Smoothing(Im, lambda, kappa)
-%L0Smooth - Image Smoothing via L0 Gradient Minimization
-%   S = L0Smooth(Im, lambda, kappa) performs L0 graidient smoothing of input
-%   image Im, with smoothness weight lambda and rate kappa.
+function S = L0Smoothing(Image, lambda, kappa)
+%L0Smooth - Image Smoothing via L0 Gradient MinImageization
+%   S = L0Smooth(Image, lambda, kappa) performs L0 graidient smoothing of input
+%   Image Image, with smoothness weight lambda and rate kappa.
 %
 %   Paras: 
-%   @Im    : Input UINT8 image, both grayscale and color images are acceptable.
+%   @Image    : Input UINT8 Image, both grayscale and color Images are acceptable.
 %   @lambda: Smoothing parameter controlling the degree of smooth. (See [1]) 
 %            Typically it is within the range [1e-3, 1e-1], 2e-2 by default.
 %   @kappa : Parameter that controls the rate. (See [1])
 %            Small kappa results in more iteratioins and with sharper edges.   
 %            We select kappa in (1, 2].    
-%            kappa = 2 is suggested for natural images.  
+%            kappa = 2 is suggested for natural Images.  
 %
 %   Example
 %   ==========
-%   Im  = imread('pflower.jpg');
-%   S  = L0Smooth(Im); % Default Parameters (lambda = 2e-2, kappa = 2)
-%   figure, imshow(Im), figure, imshow(S);
+%   Image  = Imageread('pflower.jpg');
+%   S  = L0Smooth(Image); % Default Parameters (lambda = 2e-2, kappa = 2)
+%   figure, Imageshow(Image), figure, Imageshow(S);
 
 
 if ~exist('kappa','var')
@@ -34,11 +34,11 @@ end
 if ~exist('lambda','var')
     lambda = 2e-2;
 end
-S = im2double(Im);
+S = Image2double(Image);
 betamax = 1e5;
 fx = [1, -1];
 fy = [1; -1];
-[N,M,D] = size(Im);
+[N,M,D] = size(Image);
 sizeI2D = [N,M];
 otfFx = psf2otf(fx,sizeI2D);
 otfFy = psf2otf(fy,sizeI2D);
