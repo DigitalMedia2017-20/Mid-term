@@ -28,7 +28,7 @@ function [J, tmap, tmap_ref] = darkChannel(I, px, w)
        w = 0.95;
     end
 
-    % by default, the Ω(x) size is set to 15.
+    % by default, the patch size is set to 15.
     if (nargin < 2)
        px = 15;
     end
@@ -94,7 +94,7 @@ function [J, tmap, tmap_ref] = darkChannel(I, px, w)
                       winDown=dimc;
                 end
 
-                % find the minimum value in the Ω windows
+                % find the minimum value in the patch windows
                 J_darktemp(i,j) = min(min(J_darkchannel(winLeft : winRight, winUp : winDown)));
             end
         end
