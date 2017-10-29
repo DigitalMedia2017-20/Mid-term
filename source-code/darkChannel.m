@@ -1,3 +1,18 @@
+% Date:29/10/2017
+% This code refers to the code written by Changkai Zhao
+% Email:changkaizhao1006@gmail.com
+% completed and corrected in 20/06/2013 and in 23/06/2013
+%
+% This algorithm is described in details in
+%
+% "Single Image Haze Removal Using Dark Channel Prior",
+% by Kaiming He Jian Sun Xiaoou Tang,
+% In: CVPR 2009
+
+% details about guilded image filter in
+% "Guilded image filtering"
+% by Kaiming He Jian Sun Xiaoou Tang
+
 % OUTPUT:
 % J is the obtained clear image after visibility restoration.
 % tmap is the raw transmission map.
