@@ -138,7 +138,7 @@ function [J, tmap, tmap_ref] = darkChannel(I, px, w)
                     winDown = dimc;
                 end
 
-                % find the minimum value in the Ω windows
+                % find the minimum value in the patch windows
                 % get the image transmittance
                 t_map(i, j) = 1 - w * min(min(tmap(winLeft : winRight, winUp : winDown)));
             end
