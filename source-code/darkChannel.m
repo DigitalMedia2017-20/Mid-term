@@ -28,7 +28,7 @@ function [J, t_map, tmap_ref] = darkChannel(I, px, w)
        w = 0.95;
     end
 
-    % by default, the Ω(x) size is set to 15.
+    % by default, the patch size is set to 15.
     if (nargin < 2)
        px = 15;
     end
@@ -67,13 +67,13 @@ function [J, t_map, tmap_ref] = darkChannel(I, px, w)
     if(col == 3)
     	% find darkChannel
         J_darkchannel = findDarkChannel(Image, dimr, dimc, dx);
-
+        
         % get the Airlight
         Airlight = getAirlight(J_darkchannel, Image);
 
         % Estimating the raw transmission map(color)
         t_map = getRawTransmissionMap(Airlight, Image, dimr, dimc, dx, w);
-        
+
         % Refine the raw transmission map(color)
         % using softmatting
         tmap_ref = softmatting(Image, t_map);
