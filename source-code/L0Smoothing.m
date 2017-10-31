@@ -34,7 +34,7 @@ end
 if ~exist('lambda','var')
     lambda = 2e-2;
 end
-S = Image2double(Image);
+S = im2double(Image);
 betamax = 1e5;
 fx = [1, -1];
 fy = [1; -1];

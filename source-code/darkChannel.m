@@ -18,7 +18,7 @@
 % tmap is the raw transmission map.
 % tmap_ref is the refined transmission map.
 
-function [J, tmap, tmap_ref] = darkChannel(I, px, w)
+function [J, t_map, tmap_ref] = darkChannel(I, px, w)
 
     % calculate running time
     tic;
@@ -57,93 +57,23 @@ function [J, tmap, tmap_ref] = darkChannel(I, px, w)
     end
 
     % Pick the top 0.1% brightest pixels in the dark channel.
-    Image = im2double(I);
+    inputImage = im2double(I);
     [dimr, dimc, col] = size(I);
     dx = floor(px / 2);
 
     % L0Smoothing
-    % Image = L0Smoothing(Image, 0.003);
-
-    % Initial four matrices
-    J          = zeros(dimr, dimc, col);
-    t_map      = zeros(dimr, dimc);
-    J_darktemp = zeros(dimr, dimc);
-    tmap_ref   = zeros(dimr, dimc);
+    Image = L0Smoothing(inputImage, 0.015);
 
     if(col == 3)
-        A_r = 0; A_g = 0; A_b = 0;
-
-        % Estimate the atmospheric light
-        J_darkchannel = min(Image, [], 3);  % find the minimum value in RGB channel
-        for i = (1 : dimr)
-            for j = (1 : dimc)
-                winLeft = i - dx; winRight = i + dx;
-                winUp   = j - dx; winDown  = j + dx;
-
-                % check the windows range
-                if(i - dx < 1)
-                    winLeft = 1;
-                end
-                if(i + dx > dimr)
-                    winRight = dimr;
-                end
-                if(j - dx < 1)
-                    winUp = 1;
-                end
-                if(j+dx>dimc)
-                      winDown=dimc;
-                end
-
-                % find the minimum value in the patch windows
-                J_darktemp(i,j) = min(min(J_darkchannel(winLeft : winRight, winUp : winDown)));
-            end
-        end
-        J_darkchannel = J_darktemp;
-
-        % get the 0.1% most brightest pixels in the dark channel
-        lightLimit = quantile(J_darkchannel(:), [.999]);
-        [lightRow, lightCol] = find(J_darkchannel >= lightLimit);
-        [enum, ~] = size(lightRow);
-        for i = (1 : enum)
-            A_r = Image(lightRow(i), lightCol(i), 1) + A_r;
-            A_g = Image(lightRow(i), lightCol(i), 2) + A_g;
-            A_b = Image(lightRow(i), lightCol(i), 3) + A_b;
-        end
-
+    	% find darkChannel
+        J_darkchannel = findDarkChannel(Image, dimr, dimc, dx);
+        
         % get the Airlight
-        Airlight = [A_r / enum, A_g / enum, A_b / enum];
+        Airlight = getAirlight(J_darkchannel, Image);
 
         % Estimating the raw transmission map(color)
-        Im_n(:, :, 1) = Image(:, :, 1) ./ Airlight(1);
-        Im_n(:, :, 2) = Image(:, :, 2) ./ Airlight(2);
-        Im_n(:, :, 3) = Image(:, :, 3) ./ Airlight(3);
-        tmap = min(Im_n, [], 3);
+        t_map = getRawTransmissionMap(Airlight, Image, dimr, dimc, dx, w);
 
-        for i = (1 : dimr)
-            for j = (1 : dimc)
-                winLeft = i - dx; winRight = i + dx;
-                winUp   = j - dx; winDown  = j + dx;
-
-                 % check the windows range
-                if(i - dx < 1)
-                    winLeft = 1;
-                end
-                if(i + dx > dimr)
-                    winRight = dimr;
-                end
-                if(j - dx < 1)
-                    winUp = 1;
-                end
-                if(j + dx > dimc)
-                    winDown = dimc;
-                end
-
-                % find the minimum value in the Ω windows
-                % get the image transmittance
-                t_map(i, j) = 1 - w * min(min(tmap(winLeft : winRight, winUp : winDown)));
-            end
-        end
-        
         % Refine the raw transmission map(color)
         % using softmatting
         tmap_ref = softmatting(Image, t_map);
@@ -152,22 +82,18 @@ function [J, tmap, tmap_ref] = darkChannel(I, px, w)
         % tmap_ref = guidedfilter_color(Image, t_map, 40, 0.001);
 
         % Getting the clear image(color)
-        % set the lowest t0
-        [lightRow, lightCol] = find(tmap_ref < 0.1);
-        [enum, ~] = size(lightRow);
-        for i = (1 : enum)
-            tmap_ref(lightRow(i), lightCol(i)) = 0.1;
-        end
-
-        J(:, :, 1) = (Image(:, :, 1) - Airlight(1)) ./ tmap_ref + Airlight(1);
-        J(:, :, 2) = (Image(:, :, 2) - Airlight(2)) ./ tmap_ref + Airlight(2);
-        J(:, :, 3) = (Image(:, :, 3) - Airlight(3)) ./ tmap_ref + Airlight(3);
+        J = getClearImage(dimr, dimc, col, tmap_ref, Airlight, inputImage);
 
         % show the result
         figure,imshow(Image),title('Input Image');
         figure,imshow(t_map),title('Raw t map');
         figure,imshow(tmap_ref),title('Refined t map');
         figure,imshow(J),title('Output Image');
+        
+        imwrite(Image, 'Input_Image.jpg');
+        imwrite(t_map, 'Raw_t_map.jpg');
+        imwrite(tmap_ref, 'Refined_t_map.jpg');
+        imwrite(J, 'Output_Image.jpg');
     end
 
     % stop calculate running time
